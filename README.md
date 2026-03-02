@@ -1,7 +1,7 @@
 # Hierarchical Zooplankton Classification
 
 ## Project Overview
-The primary goal of my project is to develop a robust, hierarchy-aware machine learning pipeline for the automated classification of zooplankton images. While standard flat classifiers have been previously implemented for this dataset by my collaborator, Dr. Sofia, this project explores a multi-head hierarchical neural network. By structuring the model this way, the goal is to capture the natural ecological relationships in the data, learning shared visual features at broader taxonomic levels before predicting specific variations.
+The primary goal of this project is to develop a hierarchy-aware machine learning pipeline for the automated classification of zooplankton images. While standard flat classifiers have been previously implemented for this dataset by my collaborator, Dr. Sofia, this project explores a multi-head hierarchical neural network. By structuring the model this way, the goal is to capture the natural ecological relationships in the data, learning shared visual features at broader taxonomic levels before predicting specific variations.
 
 ## Dataset Details
 The dataset initially consisted of large mosaic images containing multiple specimens and artifacts. Using a preprocessing notebook provided by Dr. Sofia, I extracted fine cut-outs of individual subjects. The resulting dataset consists of these cropped images, categorized into a uniquely unbalanced three-level hierarchical taxonomy:
