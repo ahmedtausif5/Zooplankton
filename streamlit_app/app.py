@@ -66,12 +66,11 @@ if uploaded_file is not None:
             results = infer_single_image(image, model, device)
             
         st.success("Classification Complete!")
-        
-        # Display results in 3 neat columns
+                
+        # Display results vertically to prevent text truncation
         st.subheader("Hierarchical Predictions")
-        col1, col2, col3 = st.columns(3)
         
-        # Format the confidence scores as percentages
-        col1.metric("Level 0 (Bio vs Non-Bio)", results['Level 0']['Class'], f"{results['Level 0']['Confidence']:.2%}")
-        col2.metric("Level 1 (Order)", results['Level 1']['Class'], f"{results['Level 1']['Confidence']:.2%}")
-        col3.metric("Level 2 (Family)", results['Level 2']['Class'], f"{results['Level 2']['Confidence']:.2%}")
+        # Call st.metric directly so they stack on top of each other
+        st.metric("Level 0 (Bio vs Non-Bio)", results['Level 0']['Class'], f"{results['Level 0']['Confidence']:.2%}")
+        st.metric("Level 1 (Order)", results['Level 1']['Class'], f"{results['Level 1']['Confidence']:.2%}")
+        st.metric("Level 2 (Family)", results['Level 2']['Class'], f"{results['Level 2']['Confidence']:.2%}")
