@@ -12,7 +12,7 @@ from inference import infer_single_image
 st.set_page_config(page_title="Zooplankton Classifier", page_icon="🔬", layout="centered")
 
 # Paste your Google Drive ID here
-DRIVE_FILE_ID = ''1NlvYztsQ9156BEuSBkl1uGMDTKe-EJc-''
+DRIVE_FILE_ID = '1NlvYztsQ9156BEuSBkl1uGMDTKe-EJc-'
 MODEL_SAVE_PATH = 'models/best_zooplankton_model_v2.pth'
 
 # --- MODEL LOADING ---
