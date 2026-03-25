@@ -3,7 +3,7 @@ import torch.nn.functional as F
 import torchvision.transforms as transforms
 from model import VALID_L0_MAPPING, VALID_L1_MAPPING, VALID_L2_MAPPING, REVERSE_L0_MAP, REVERSE_L1_MAP, REVERSE_L2_MAP
 
-# Ensure inputs are shaped perfectly for the ViT backbone
+# Ensuring inputs are shaped perfectly for the ViT backbone
 inference_transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor()
@@ -17,7 +17,7 @@ def predict_strict_hierarchy(model, images, map_l0, map_l1, map_l2):
         logits = model(images)
         batch_size = images.shape[0]
         
-        # Calculate probabilities from logits using Softmax
+        # Calculating probabilities from logits using Softmax
         probs_l0 = F.softmax(logits['L0'], dim=1)
         probs_l1 = F.softmax(logits['L1'], dim=1)
         probs_l2 = F.softmax(logits['L2'], dim=1)
@@ -96,18 +96,18 @@ def predict_strict_hierarchy(model, images, map_l0, map_l1, map_l2):
 
 def infer_single_image(image, model, device):
     """Processes a PIL Image from Streamlit and returns formatted predictions."""
-    # Ensure image has 3 RGB channels (transparency/alpha channels cause crashes)
+    # Ensuring image has 3 RGB channels
     image = image.convert('RGB')
     
-    # Apply transform and add the missing batch dimension
+    # Applying transform and adding the missing batch dimension
     input_tensor = inference_transform(image).unsqueeze(0).to(device)
     
-    # Run the strict pipeline
+    # Running the strict pipeline
     (p_l0, prob_l0), (p_l1, prob_l1), (p_l2, prob_l2) = predict_strict_hierarchy(
         model, input_tensor, VALID_L0_MAPPING, VALID_L1_MAPPING, VALID_L2_MAPPING
     )
     
-    # Extract data and map back to strings
+    # Extracting data and map back to strings
     results = {
         'Level 0': {'Class': REVERSE_L0_MAP.get(p_l0.item(), "Unknown"), 'Confidence': prob_l0.item()},
         'Level 1': {'Class': REVERSE_L1_MAP.get(p_l1.item(), "Unknown"), 'Confidence': prob_l1.item()},
