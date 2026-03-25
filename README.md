@@ -1,31 +1,41 @@
-# Hierarchical Zooplankton Classification
+# Hierarchical Zooplankton Classifier
 
-## Project Overview
-The primary goal of this project is to develop a hierarchy-aware machine learning pipeline for the automated classification of zooplankton images. While standard flat classifiers have been previously implemented for this dataset by my collaborator, Dr. Sofia, this project explores a multi-head hierarchical neural network. By structuring the model this way, the goal is to capture the natural ecological relationships in the data, learning shared visual features at broader taxonomic levels before predicting specific variations.
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://zooplankton-classifier.streamlit.app/)
 
-## Dataset Details
-The dataset initially consisted of large mosaic images containing multiple specimens and artifacts. Using a preprocessing notebook provided by Dr. Sofia, I extracted fine cut-outs of individual subjects. The resulting dataset consists of these cropped images, categorized into a uniquely unbalanced three-level hierarchical taxonomy:
+A computer vision pipeline utilizing a custom multi-head Vision Transformer (ViT) to classify microscopic images of zooplankton and aquatic debris. The model enforces strict biological taxonomy through top-down hierarchical masking to ensure biologically impossible predictions are systematically prevented.
 
-* **Level 0 (Biological vs. Non-Biological):** Binary classification indicating if the subject is Zooplankton (Yes) or an artifact (No).
-* **Level 1 (Order/Broad Category):** Includes classes such as Cladocera, Copepoda, Rotifer, Bubble, Exoskeleton, and Fiber.
-* **Level 2 (Family/Genus/Life Stage):** Includes specific classes such as Bosminidae, Daphnia, Nauplius, Cyclopoid, Harpacticoid, and Calanoid.
+## Live Web Application
+The model is fully deployed and accessible via Streamlit Community Cloud:
+**[Test the Live Application Here](https://zooplankton-classifier.streamlit.app/)**
 
-A key characteristic of this dataset is its unbalanced structure. Several Level 1 classes (specifically Rotifer, Bubble, Exoskeleton, and Fiber) are terminal nodes and do not possess Level 2 children. To handle this mathematically, the PyTorch Dataset class assigns a `-1` integer value to represent "Not Applicable" for missing deeper levels. 
+***
 
-The data is rigorously cleaned and split into a 70% Training, 15% Validation, and 15% Testing distribution. Images are preprocessed and resized to 224x224 pixels.
+## Project Workflow & Data Pipeline
 
-## Methodology and Architecture
+This project was built systematically from raw data processing to web deployment:
 
-### 1. Model Architecture
-The pipeline utilizes a pre-trained Vision Transformer (ViT-B/16) as a core feature extractor. The standard classification head is replaced with three independent, parallel linear heads corresponding to Level 0, Level 1, and Level 2 of the taxonomy.
+1. **Raw Data Acquisition:** The initial dataset consisted of raw mosaic images provided by the Ministry of Natural Resources (MNR) via Dr. Sofia. These were stored in `data/Classified_Data`.
+2. **Preprocessing:** Using the `notebooks/pre_process_data.ipynb` script provided by Dr. Sofia, the raw mosaic images were systematically cropped into individual specimen images and sorted into specific taxonomic folders within `data/Processed_Data`.
+3. **Exploratory Data Analysis (EDA):** Conducted in `notebooks/eda.ipynb` to understand class distributions, image dimensions, and biological hierarchies.
+4. **Model Prototyping:** The core deep learning research, including training, validation, and local inference testing of the Vision Transformer, was developed in `notebooks/train_test_prototype.ipynb`.
+5. **Web Deployment:** The finalized inference logic and model architecture were abstracted into modular Python scripts to power a live Streamlit web application.
 
-### 2. Custom Loss Function
-To train the multi-head architecture, I engineered a custom multi-task Cross-Entropy loss function. It calculates the loss for each hierarchical level independently but incorporates an `ignore_index=-1` mechanism. This ensures the model safely skips gradient penalties for terminal nodes, allowing specialized layers to learn without being skewed by missing data.
+***
 
-### 3. Strict Top-Down Inference
-To completely prevent biological contradictions during evaluation, a cascading logit-masking inference function enforces strict top-down taxonomy rules. The model predicts the parent node first, and mathematically masks (sets to negative infinity) any child node logits that do not biologically belong to that predicted parent.
+## Repository Structure
 
-## Current Project Status
-* **Data Engineering:** Completed. Hierarchical parsing and DataLoader classes are fully functional.
-* **Prototyping:** Currently conducting Phase 1 training using linear probing. The ViT backbone is frozen to allow rapid iteration and debugging on the classification heads and masking logic.
-* **Upcoming Steps:** Full model fine-tuning (unfreezing the backbone), rigorous evaluation using Strict Path Accuracy, and deployment via a Streamlit web application.
+```text
+Zooplankton-Data/
+├── data/
+│   ├── Classified_Data/      # Original raw mosaic images from MNR
+│   ├── CSV_Data/             # Tabular metadata and structured labels
+│   └── Processed_Data/       # Cropped and sorted individual specimen images
+├── notebooks/
+│   ├── eda.ipynb                     # Exploratory Data Analysis
+│   ├── pre_process_data.ipynb        # Cropping and sorting script
+│   └── train_test_prototype.ipynb    # Model training and validation pipeline
+└── streamlit_app/            # Lightweight production deployment code
+    ├── app.py                # Streamlit frontend and UI logic
+    ├── inference.py          # Image processing and strict masking logic
+    ├── model.py              # PyTorch ViT class and mapping dictionaries
+    └── requirements.txt      # Production dependencies
